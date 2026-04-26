@@ -87,8 +87,25 @@ export interface AIInsight {
 export const getHottestCollections = (limit = 20) =>
   get<NFTCollection[]>(`/market/collections?limit=${limit}`);
 
+export interface NFTMarketStats {
+  // OpenSea aggregate
+  total_collections: number;
+  total_volume_24h: number;
+  total_sales_24h: number;
+  avg_floor_price: number;
+  // CoinMarketCap global
+  total_market_cap: number | null;
+  total_volume_crypto: number | null;
+  btc_dominance: number | null;
+  eth_dominance: number | null;
+  defi_volume_24h: number | null;
+  defi_market_cap: number | null;
+  nft_volume_24h: number | null;
+  sentiment: 'BULLISH' | 'NEUTRAL' | null;
+}
+
 export const getMarketStats = () =>
-  get<Record<string, unknown>>('/market/stats');
+  get<NFTMarketStats>('/market/stats');
 
 // ─── Collections ─────────────────────────────────────────────────────────────
 

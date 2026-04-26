@@ -5,11 +5,24 @@ export default async function handler(req, res) {
   secureHeaders(res);
 
   const limit = clampInt(req.query.limit, 1, 20);
-  const openseaHeaders = { 'X-API-KEY': process.env.OPENSEA_API_KEY ?? '' };
   const moralisHeaders = { 'X-API-Key': process.env.MORALIS_API_KEY ?? '' };
 
   try {
-    // Fetch collections list + ETH price in parallel
+    // Moralis market-data has buyers_count + sellers_count natively
+    const moralisRes = await fetch(
+      `https://deep-index.moralis.io/api/v2.2/market-data/nft/hottest-collections?days=1`,
+      { headers: moralisHeaders }
+    );
+
+    if (moralisRes.ok) {
+      const data = await moralisRes.json();
+      const collections = (Array.isArray(data) ? data : data.result ?? []).slice(0, limit);
+      return res.json(collections);
+    }
+
+    // Fallback: OpenSea collections + Moralis ETH price
+    const openseaHeaders = { 'X-API-KEY': process.env.OPENSEA_API_KEY ?? '' };
+
     const [collectionsRes, ethPriceRes] = await Promise.all([
       fetch(`https://api.opensea.io/api/v2/collections?chain=ethereum&limit=${limit}&order_by=seven_day_volume`, { headers: openseaHeaders }),
       fetch('https://deep-index.moralis.io/api/v2.2/erc20/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/price?chain=eth', { headers: moralisHeaders }),
@@ -21,7 +34,6 @@ export default async function handler(req, res) {
 
     const collections = (collectionsData.collections ?? []).slice(0, limit);
 
-    // Fetch stats for each collection in parallel
     const statsResults = await Promise.all(
       collections.map(c =>
         fetch(`https://api.opensea.io/api/v2/collections/${c.collection}/stats`, { headers: openseaHeaders })
@@ -35,9 +47,9 @@ export default async function handler(req, res) {
       const total = stats?.total ?? {};
       const interval = stats?.intervals?.find(iv => iv.interval === 'one_day') ?? {};
 
-      const floorEth  = parseFloat(total.floor_price ?? 0);
-      const volEth    = parseFloat(interval.volume ?? total.volume ?? 0);
-      const avgEth    = parseFloat(interval.average_price ?? total.average_price ?? 0);
+      const floorEth = parseFloat(total.floor_price ?? 0);
+      const volEth   = parseFloat(interval.volume ?? total.volume ?? 0);
+      const avgEth   = parseFloat(interval.average_price ?? total.average_price ?? 0);
 
       return {
         collection_address: c.contracts?.[0]?.address ?? '',

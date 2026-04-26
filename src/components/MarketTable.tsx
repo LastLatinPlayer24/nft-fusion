@@ -14,18 +14,42 @@ function fmt(n: string | undefined, prefix = '$'): string {
   return `${prefix}${v.toFixed(2)}`;
 }
 
-export function MarketTable() {
+interface Props {
+  search?: string;
+  sortBy?: string;
+  refreshKey?: number;
+}
+
+function sorted(list: NFTCollection[], by: string): NFTCollection[] {
+  return [...list].sort((a, b) => {
+    if (by === 'floor') return parseFloat(b.floor_price_usd ?? '0') - parseFloat(a.floor_price_usd ?? '0');
+    if (by === 'buyers') return (b.buyers_count ?? 0) - (a.buyers_count ?? 0);
+    if (by === 'txns') return (b.transactions_count ?? 0) - (a.transactions_count ?? 0);
+    return parseFloat(b.volume_usd ?? '0') - parseFloat(a.volume_usd ?? '0');
+  });
+}
+
+export function MarketTable({ search = '', sortBy = 'volume', refreshKey = 0 }: Props) {
   const { t } = useLanguage();
   const [collections, setCollections] = React.useState<NFTCollection[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    setLoading(true);
+    setError(null);
     getHottestCollections(20)
       .then(setCollections)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshKey]);
+
+  const displayed = React.useMemo(() => {
+    const filtered = search
+      ? collections.filter(c => c.name?.toLowerCase().includes(search.toLowerCase()))
+      : collections;
+    return sorted(filtered, sortBy);
+  }, [collections, search, sortBy]);
 
   if (loading) {
     return (
@@ -46,9 +70,17 @@ export function MarketTable() {
     );
   }
 
+  if (!loading && displayed.length === 0 && search) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        <p>No collections match &ldquo;{search}&rdquo;</p>
+      </div>
+    );
+  }
+
   const MobileView = () => (
     <div className="md:hidden space-y-3">
-      {collections.map((c, i) => (
+      {displayed.map((c, i) => (
         <Card key={c.collection_address ?? i} className="p-3 cursor-pointer hover:shadow-lg transition-shadow">
           <CardContent className="p-0">
             <div className="flex justify-between items-start mb-2">
@@ -96,7 +128,7 @@ export function MarketTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {collections.map((c, i) => (
+          {displayed.map((c, i) => (
             <TableRow key={c.collection_address ?? i} className="cursor-pointer hover:bg-muted/50">
               <TableCell className="text-muted-foreground text-xs">{i + 1}</TableCell>
               <TableCell>

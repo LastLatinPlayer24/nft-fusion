@@ -9,12 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export function Analysis() {
   const { t } = useLanguage();
-  const [isGenerating, setIsGenerating] = React.useState(false);
-
-  const generateAnalysis = () => {
-    setIsGenerating(true);
-    setTimeout(() => setIsGenerating(false), 3000);
-  };
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   return (
     <div className="space-y-6">
@@ -25,15 +20,14 @@ export function Analysis() {
             {t('analysis.subtitle')}
           </p>
         </div>
-        <Button onClick={generateAnalysis} disabled={isGenerating} className="w-full md:w-auto">
-          <Brain className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-pulse' : ''}`} />
+        <Button onClick={() => setRefreshKey(k => k + 1)} className="w-full md:w-auto">
+          <Brain className="h-4 w-4 mr-2" />
           {t('analysis.generate')}
         </Button>
       </div>
 
       <AnalysisFilters />
 
-      {/* Stack on mobile, side by side on desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -46,7 +40,7 @@ export function Analysis() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 md:p-6">
-            <AIInsights />
+            <AIInsights refreshKey={refreshKey} />
           </CardContent>
         </Card>
 

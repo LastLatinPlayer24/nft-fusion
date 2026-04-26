@@ -5,116 +5,85 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Filter } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useLanguage } from '@/contexts/LanguageContext';
 
-export function MarketFilters() {
-  const { t } = useLanguage();
+interface Props {
+  search: string;
+  onSearch: (v: string) => void;
+  sortBy: string;
+  onSortChange: (v: string) => void;
+}
+
+const SORT_OPTIONS = [
+  { value: 'volume', label: 'Volume 24h' },
+  { value: 'floor', label: 'Floor Price' },
+  { value: 'buyers', label: 'Buyers' },
+  { value: 'txns', label: 'Transactions' },
+];
+
+export function MarketFilters({ search, onSearch, sortBy, onSortChange }: Props) {
   const [isFilterOpen, setIsFilterOpen] = React.useState(false);
 
-  const FilterContent = () => (
-    <div className="space-y-4">
-      <Select defaultValue="all">
-        <SelectTrigger>
-          <SelectValue placeholder={t('market.allSectors')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('market.allSectors')}</SelectItem>
-          <SelectItem value="tech">{t('market.technology')}</SelectItem>
-          <SelectItem value="finance">{t('market.finance')}</SelectItem>
-          <SelectItem value="healthcare">{t('market.healthcare')}</SelectItem>
-          <SelectItem value="energy">{t('market.energy')}</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select defaultValue="all">
-        <SelectTrigger>
-          <SelectValue placeholder="Market Cap" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Caps</SelectItem>
-          <SelectItem value="large">Large Cap</SelectItem>
-          <SelectItem value="mid">Mid Cap</SelectItem>
-          <SelectItem value="small">Small Cap</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Button 
-        className="w-full" 
-        onClick={() => setIsFilterOpen(false)}
-      >
-        {t('market.applyFilters')}
-      </Button>
-    </div>
+  const SortSelect = ({ className }: { className?: string }) => (
+    <Select value={sortBy} onValueChange={onSortChange}>
+      <SelectTrigger className={className ?? 'w-[160px]'}>
+        <SelectValue placeholder="Sort by" />
+      </SelectTrigger>
+      <SelectContent>
+        {SORT_OPTIONS.map(o => (
+          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 
   return (
     <Card>
       <CardContent className="p-4">
-        {/* Mobile Layout */}
-        <div className="md:hidden space-y-4">
+        {/* Mobile */}
+        <div className="md:hidden space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder={t('market.search')}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search collections..."
               className="pl-10"
+              value={search}
+              onChange={e => onSearch(e.target.value)}
             />
           </div>
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Filter className="h-4 w-4 mr-2" />
-                Filters
+                Sort & Filter
               </Button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[400px]">
+            <SheetContent side="bottom" className="h-[300px]">
               <SheetHeader className="mb-6">
-                <SheetTitle>Market Filters</SheetTitle>
+                <SheetTitle>Sort Collections</SheetTitle>
               </SheetHeader>
-              <FilterContent />
+              <div className="space-y-4">
+                <SortSelect className="w-full" />
+                <Button className="w-full" onClick={() => setIsFilterOpen(false)}>Apply</Button>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
 
-        {/* Desktop Layout */}
-        <div className="hidden md:flex md:flex-row gap-4 items-center">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder={t('market.search')}
-                className="pl-10"
-              />
-            </div>
+        {/* Desktop */}
+        <div className="hidden md:flex gap-4 items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search collections by name..."
+              className="pl-10"
+              value={search}
+              onChange={e => onSearch(e.target.value)}
+            />
           </div>
-          
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Sector" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('market.allSectors')}</SelectItem>
-              <SelectItem value="tech">{t('market.technology')}</SelectItem>
-              <SelectItem value="finance">{t('market.finance')}</SelectItem>
-              <SelectItem value="healthcare">{t('market.healthcare')}</SelectItem>
-              <SelectItem value="energy">{t('market.energy')}</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Market Cap" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Caps</SelectItem>
-              <SelectItem value="large">Large Cap</SelectItem>
-              <SelectItem value="mid">Mid Cap</SelectItem>
-              <SelectItem value="small">Small Cap</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button variant="outline">
-            {t('market.applyFilters')}
-          </Button>
+          <SortSelect />
+          {search && (
+            <Button variant="outline" onClick={() => onSearch('')}>Clear</Button>
+          )}
         </div>
       </CardContent>
     </Card>

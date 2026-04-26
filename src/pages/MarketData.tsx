@@ -8,12 +8,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export function MarketData() {
   const { t } = useLanguage();
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 2000);
-  };
+  const [search, setSearch] = React.useState('');
+  const [sortBy, setSortBy] = React.useState('volume');
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   return (
     <div className="space-y-6">
@@ -24,13 +21,18 @@ export function MarketData() {
             {t('market.subtitle')}
           </p>
         </div>
-        <Button onClick={handleRefresh} disabled={isRefreshing} className="w-full md:w-auto">
-          <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+        <Button onClick={() => setRefreshKey(k => k + 1)} className="w-full md:w-auto">
+          <RefreshCw className="h-4 w-4 mr-2" />
           {t('market.refresh')}
         </Button>
       </div>
 
-      <MarketFilters />
+      <MarketFilters
+        search={search}
+        onSearch={setSearch}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
 
       <Card>
         <CardHeader>
@@ -40,7 +42,7 @@ export function MarketData() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-3 md:p-6">
-          <MarketTable />
+          <MarketTable search={search} sortBy={sortBy} refreshKey={refreshKey} />
         </CardContent>
       </Card>
     </div>

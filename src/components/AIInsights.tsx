@@ -12,7 +12,11 @@ const typeConfig = {
   signal: { icon: Zap, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950', border: 'border-blue-200 dark:border-blue-800' },
 };
 
-export function AIInsights() {
+interface Props {
+  refreshKey?: number;
+}
+
+export function AIInsights({ refreshKey = 0 }: Props) {
   const { t } = useLanguage();
   const [insights, setInsights] = React.useState<AIInsight[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -25,7 +29,7 @@ export function AIInsights() {
       .finally(() => setLoading(false));
   }, []);
 
-  React.useEffect(() => { load(); }, [load]);
+  React.useEffect(() => { load(); }, [load, refreshKey]);
 
   if (loading) {
     return (
