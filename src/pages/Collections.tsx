@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2, ImageOff, ExternalLink, TrendingUp } from 'lucide-react';
-import { getTopCollections, searchCollections, type OpenSeaCollection } from '@/services/api';
+import { getTopCollections, searchCollections, proxyImg, type OpenSeaCollection } from '@/services/api';
 
 export default function Collections() {
   const [query, setQuery] = React.useState('');
@@ -92,7 +92,7 @@ export default function Collections() {
               <div className="h-24 bg-gradient-to-br from-primary/20 to-muted relative overflow-hidden">
                 {c.banner_image_url ? (
                   <img
-                    src={c.banner_image_url}
+                    src={proxyImg(c.banner_image_url)}
                     alt=""
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -103,7 +103,7 @@ export default function Collections() {
                 <div className="absolute bottom-0 left-4 translate-y-1/2">
                   {c.image_url ? (
                     <img
-                      src={c.image_url}
+                      src={proxyImg(c.image_url)}
                       alt=""
                       className="w-12 h-12 rounded-full border-2 border-background object-cover"
                     />

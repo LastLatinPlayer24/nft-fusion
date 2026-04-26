@@ -1,5 +1,10 @@
 const BASE = '/api';
 
+export function proxyImg(url?: string): string | undefined {
+  if (!url) return undefined;
+  return `${BASE}/images?url=${encodeURIComponent(url)}`;
+}
+
 async function get<T>(path: string): Promise<T> {
   const r = await fetch(`${BASE}${path}`);
   if (!r.ok) throw new Error(`API ${path}: ${r.status}`);

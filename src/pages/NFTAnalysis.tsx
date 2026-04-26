@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, Loader2, Brain, TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
-import { getHottestCollections, analyzeNFT, type NFTCollection } from '@/services/api';
+import { getHottestCollections, analyzeNFT, proxyImg, type NFTCollection } from '@/services/api';
 
 export default function NFTAnalysis() {
   const [query, setQuery] = React.useState('');
@@ -88,7 +88,7 @@ export default function NFTAnalysis() {
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       {c.collection_image ? (
-                        <img src={c.collection_image} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                        <img src={proxyImg(c.collection_image)} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-muted flex-shrink-0 flex items-center justify-center">
                           <ImageOff className="h-4 w-4 text-muted-foreground" />
@@ -129,7 +129,7 @@ export default function NFTAnalysis() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   {selected.collection_image && (
-                    <img src={selected.collection_image} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    <img src={proxyImg(selected.collection_image)} alt="" className="w-10 h-10 rounded-full object-cover" />
                   )}
                   <div>
                     <CardTitle className="flex items-center gap-2">

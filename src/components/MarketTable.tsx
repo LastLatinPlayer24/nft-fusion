@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Loader2, ImageOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getHottestCollections, type NFTCollection } from '@/services/api';
+import { getHottestCollections, proxyImg, type NFTCollection } from '@/services/api';
 
 function fmt(n: string | undefined, prefix = '$'): string {
   const v = parseFloat(n ?? '0');
@@ -54,7 +54,7 @@ export function MarketTable() {
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2 min-w-0">
                 {c.collection_image ? (
-                  <img src={c.collection_image} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  <img src={proxyImg(c.collection_image)} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-muted flex-shrink-0" />
                 )}
@@ -102,7 +102,7 @@ export function MarketTable() {
               <TableCell>
                 <div className="flex items-center gap-2">
                   {c.collection_image ? (
-                    <img src={c.collection_image} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                    <img src={proxyImg(c.collection_image)} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0" />
                   )}

@@ -1,87 +1,73 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Brain, TrendingUp, TrendingDown } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { getAIInsights, type AIInsight } from '@/services/api';
 
 export function RecentAnalysis() {
-  const analyses = [
-    {
-      symbol: 'AAPL',
-      prediction: 'Bullish',
-      confidence: 87,
-      target: '$185.50',
-      timeframe: '7 days',
-      isPositive: true
-    },
-    {
-      symbol: 'TSLA',
-      prediction: 'Bearish',
-      confidence: 73,
-      target: '$220.00',
-      timeframe: '14 days',
-      isPositive: false
-    },
-    {
-      symbol: 'MSFT',
-      prediction: 'Bullish',
-      confidence: 92,
-      target: '$395.75',
-      timeframe: '30 days',
-      isPositive: true
-    },
-    {
-      symbol: 'GOOGL',
-      prediction: 'Neutral',
-      confidence: 65,
-      target: '$142.25',
-      timeframe: '7 days',
-      isPositive: null
-    }
-  ];
+  const [insights, setInsights] = React.useState<AIInsight[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  const getPredictionColor = (prediction: string) => {
-    switch (prediction.toLowerCase()) {
-      case 'bullish': return 'default';
-      case 'bearish': return 'destructive';
-      case 'neutral': return 'secondary';
-      default: return 'outline';
+  React.useEffect(() => {
+    getAIInsights('top NFT collections market overview')
+      .then(setInsights)
+      .catch(() => setInsights([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getBadgeVariant = (type: AIInsight['type']) => {
+    switch (type) {
+      case 'opportunity': return 'default' as const;
+      case 'warning':     return 'destructive' as const;
+      case 'signal':      return 'secondary' as const;
     }
   };
+
+  const getIcon = (type: AIInsight['type']) =>
+    type === 'warning'
+      ? <TrendingDown className="h-4 w-4 text-red-600" />
+      : <TrendingUp className="h-4 w-4 text-green-600" />;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Brain className="h-5 w-5 mr-2" />
-          Recent AI Analysis
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="h-5 w-5" />
+          AI Market Insights
         </CardTitle>
-        <CardDescription>
-          Latest predictions and market insights
-        </CardDescription>
+        <CardDescription>Live NFT market signals powered by AI</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {analyses.map((analysis, index) => (
-            <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center space-x-4">
-                <div className="font-mono font-bold text-lg">{analysis.symbol}</div>
-                <div className="flex items-center space-x-2">
-                  {analysis.isPositive === true && <TrendingUp className="h-4 w-4 text-green-600" />}
-                  {analysis.isPositive === false && <TrendingDown className="h-4 w-4 text-red-600" />}
-                  <Badge variant={getPredictionColor(analysis.prediction)}>
-                    {analysis.prediction}
+        {loading ? (
+          <div className="flex items-center justify-center py-8 text-muted-foreground">
+            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            Analyzing market...
+          </div>
+        ) : insights.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground py-6">No insights available</p>
+        ) : (
+          <div className="space-y-4">
+            {insights.map((ins, i) => (
+              <div key={i} className="flex items-start justify-between gap-3 p-4 border rounded-lg">
+                <div className="flex items-start gap-3 min-w-0">
+                  {getIcon(ins.type)}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">{ins.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{ins.description}</p>
+                  </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <Badge variant={getBadgeVariant(ins.type)} className="capitalize text-xs">
+                    {ins.type}
                   </Badge>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {Math.round(ins.confidence * 100)}% confidence
+                  </p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-semibold">{analysis.target}</div>
-                <div className="text-sm text-muted-foreground">
-                  {analysis.confidence}% confidence • {analysis.timeframe}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
