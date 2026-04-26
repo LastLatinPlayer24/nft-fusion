@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
+  "installCommand": "pnpm install --config.auto-install-peers=true",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
