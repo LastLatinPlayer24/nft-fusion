@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Loader2, Brain, TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
+import { Search, Loader2, Brain, TrendingUp, TrendingDown, ImageOff, ExternalLink } from 'lucide-react';
 import { getHottestCollections, analyzeNFT, proxyImg, type NFTCollection } from '@/services/api';
 
 export default function NFTAnalysis() {
@@ -102,9 +103,17 @@ export default function NFTAnalysis() {
                             {isBullish ? 'Bullish' : 'Bearish'}
                           </Badge>
                         </div>
-                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                          <span>Floor: {floorNum.toFixed(3)} ETH</span>
-                          <span>Txns: {c.transactions_count ?? 0}</span>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex gap-3 text-xs text-muted-foreground">
+                            <span>Floor: {floorNum.toFixed(3)} ETH</span>
+                            <span>Txns: {c.transactions_count ?? 0}</span>
+                          </div>
+                          <Link
+                            to={`/nft-analysis/${c.collection_address}`}
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                          </Link>
                         </div>
                       </div>
                     </div>
