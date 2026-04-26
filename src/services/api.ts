@@ -105,10 +105,10 @@ export interface AlchemyNFTResponse {
 }
 
 export const getWalletNFTs = (address: string, pageSize = 20) =>
-  get<AlchemyNFTResponse>(`/wallet/${address}/nfts?pageSize=${pageSize}`);
+  get<AlchemyNFTResponse>(`/wallet/nfts?address=${address}&pageSize=${pageSize}`);
 
 export const getWalletTokens = (address: string, chain = 'eth') =>
-  get<WalletToken[]>(`/wallet/${address}/tokens?chain=${chain}`);
+  get<WalletToken[]>(`/wallet/tokens?address=${address}&chain=${chain}`);
 
 // ─── AI ───────────────────────────────────────────────────────────────────────
 
