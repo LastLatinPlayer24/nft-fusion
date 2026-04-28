@@ -25,7 +25,7 @@ const LanguageProviderContext = React.createContext<LanguageProviderState>(initi
 export function LanguageProvider({
   children,
   defaultLanguage = 'es',
-  storageKey = 'app-language',
+  storageKey = 'app-language-v2',
   ...props
 }: LanguageProviderProps) {
   const [language, setLanguage] = React.useState<Language>(
