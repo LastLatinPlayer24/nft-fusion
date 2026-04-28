@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MarketOverview } from '@/components/MarketOverview';
 import { RecentAnalysis } from '@/components/RecentAnalysis';
 import { PerformanceChart } from '@/components/PerformanceChart';
+import { CryptoChart } from '@/components/CryptoChart';
+import { MarketCapPie } from '@/components/MarketCapPie';
 import { TrendingUp, TrendingDown, Activity, DollarSign, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getHottestCollections, type NFTCollection } from '@/services/api';
@@ -100,6 +102,11 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PerformanceChart />
         <MarketOverview />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CryptoChart />
+        <MarketCapPie />
       </div>
 
       <RecentAnalysis />
